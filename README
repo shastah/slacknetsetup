@@ -1,0 +1,11 @@
+Greetings, Slackers! 
+
+Let's look into migrating Slackware's net config to use iproute2!
+
+To prevent multiple people trying to push changes to master branch,
+please make changes in a user branch, push them, and I'll merge,
+or make a diff and send it to me.
+
+Before production use and/or heavy testing, grep through for any
+instances of "TODO" and fix them :-)
+
