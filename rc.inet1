@@ -51,11 +51,12 @@ fi
 # already up, do nothing.
 lo_up() {
   if grep lo: /proc/net/dev 1> /dev/null ; then
-    if ! /sbin/ifconfig | grep "^lo" 1> /dev/null ; then
-      echo "/etc/rc.d/rc.inet1:  /sbin/ifconfig lo 127.0.0.1" | $LOGGER
-      /sbin/ifconfig lo 127.0.0.1
-      echo "/etc/rc.d/rc.inet1:  /sbin/route add -net 127.0.0.0 netmask 255.0.0.0 lo" | $LOGGER
-      /sbin/route add -net 127.0.0.0 netmask 255.0.0.0 lo
+    if ! /sbin/ip | grep "^lo" 1> /dev/null ; then
+      echo "/etc/rc.d/rc.inet1:  /sbin/ip ip address add 127.0.0.1/8 dev lo" | $LOGGER
+      /sbin/ip ip address add 127.0.0.1/8 dev lo
+      /sbin/ip link set dev lo up
+      echo "/etc/rc.d/rc.inet1:  /sbin/ip route add 127.0.0.0/8 dev lo" | $LOGGER
+      /sbin/ip route add 127.0.0.0/8 dev lo 
     fi
   fi
 }
@@ -63,8 +64,8 @@ lo_up() {
 # Function to take down the loopback interface:
 lo_down() {
   if grep lo: /proc/net/dev 1> /dev/null ; then
-    echo "/etc/rc.d/rc.inet1:  /sbin/ifconfig lo down" | $LOGGER
-    /sbin/ifconfig lo down
+    echo "/etc/rc.d/rc.inet1:  /sbin/ip link set dev lo down" | $LOGGER
+    /sbin/ip link set dev lo down
   fi
 }
 
