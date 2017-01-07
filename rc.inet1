@@ -206,11 +206,11 @@ if_down() {
   if grep `echo ${1}: | cut -f 1 -d :`: /proc/net/dev 1> /dev/null ; then
     if [ "${USE_DHCP[$i]}" = "yes" ]; then
       echo "/etc/rc.d/rc.inet1:  /sbin/dhcpcd -k -d ${1}" | $LOGGER
-      /sbin/dhcpcd -k -d ${1} 2> /dev/null || /sbin/ifconfig ${1} down
+      /sbin/dhcpcd -k -d ${1} 2> /dev/null || /sbin/ip link set dev ${1} down
       sleep 1
     else
-      echo "/etc/rc.d/rc.inet1:  /sbin/ifconfig ${1} down" | $LOGGER
-      /sbin/ifconfig ${1} down
+      echo "/etc/rc.d/rc.inet1:  /sbin/ip link set dev ${1} down" | $LOGGER
+      /sbin/ip link set dev ${1} down
     fi
     if [ -x /etc/rc.d/rc.wireless ]; then
       . /etc/rc.d/rc.wireless ${1} stop # Kill wireless daemons if any.
