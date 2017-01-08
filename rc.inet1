@@ -51,9 +51,9 @@ fi
 # already up, do nothing.
 lo_up() {
   if grep lo: /proc/net/dev 1> /dev/null ; then
-    if ! /sbin/ip | grep "^lo" 1> /dev/null ; then
-      echo "/etc/rc.d/rc.inet1:  /sbin/ip ip address add 127.0.0.1/8 dev lo" | $LOGGER
-      /sbin/ip ip address add 127.0.0.1/8 dev lo
+    if ! /sbin/ip link show dev lo | grep -wq "state UP" ; then
+      echo "/etc/rc.d/rc.inet1:  /sbin/ip address add 127.0.0.1/8 dev lo" | $LOGGER
+      /sbin/ip address add 127.0.0.1/8 dev lo
       /sbin/ip link set dev lo up
       echo "/etc/rc.d/rc.inet1:  /sbin/ip route add 127.0.0.0/8 dev lo" | $LOGGER
       /sbin/ip route add 127.0.0.0/8 dev lo 
@@ -127,7 +127,7 @@ if_up() {
   fi
   if grep $(echo ${1}: | cut -f 1 -d :): /proc/net/dev 1> /dev/null ; then # interface exists
     if ! /sbin/ip addr show ${1} 2>/dev/null | grep -wq inet || \
-      ! /sbin/ip link show ${1} 2>/dev/null ; then # interface not up or not configured
+      ! /sbin/ip link show dev ${1} | grep -wq "state UP" ; then # interface not up or not configured
       if [ ! "${HWADDR[$i]}" = "" ]; then # Set hardware address _before_ the interface goes up:
         echo "/etc/rc.d/rc.inet1:  /sbin/ip link set dev ${1} address ${HWADDR[$i]}" | $LOGGER
         /sbin/ip link set dev ${1} address ${HWADDR[$i]}
