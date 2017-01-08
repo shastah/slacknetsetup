@@ -76,24 +76,27 @@ lo_down() {
 # Function to assemble a bridge interface.
 br_open() {
   # argument is 'i' - the position of this interface in the IFNAME array.
-  /sbin/brctl addbr ${IFNAME[$1]}
+  /sbin/ip link add name ${IFNAME[$1]} type bridge
   for BRIF in $(echo ${BRNICS[$1]}); do
     /sbin/ip link set $BRIF down
     /sbin/ip address add 0.0.0.0 dev $BRIF
-    /sbin/brctl addif ${IFNAME[$1]} $BRIF
+    /sbin/ip link set dev $BRIF master ${IFNAME[$1]}
+    /sbin/ip link set $BRIF up 
   done
+  /sbin/ip link set ${IFNAME[$1]} up
 }
 
 # Function to disassemble a bridge interface.
 br_close() {
+  /sbin/ip link set ${IFNAME[$1]} down
   # argument is 'i' - the position of this interface in the IFNAME array.
   #for BRIF in $(echo ${BRNICS[$1]}); do
   for BRIF in $(ls --indicator-style=none /sys/class/net/${IFNAME[$1]}/brif/)
   do
-    /sbin/brctl delif ${IFNAME[$1]} $BRIF
+    /sbin/ip link set dev $BRIF nomaster
   done
   /sbin/ip link set ${IFNAME[$1]} down
-  /sbin/brctl delbr ${IFNAME[$1]}
+  /sbin/ip link del name ${IFNAME[$1]} type bridge
 }
 
 # Function to bring up a network interface.  If the interface is
@@ -132,6 +135,9 @@ if_up() {
       if [ ! "${MTU[$i]}" = "" ]; then # Set MTU to something else than 1500
         echo "/etc/rc.d/rc.inet1:  /sbin/ip link set dev ${1} mtu ${MTU[$i]}" | $LOGGER
         /sbin/ip link set dev ${1} mtu ${MTU[$i]}
+      fi
+      if /sbin/ip link show dev ${1} | grep -wq "state DOWN" ; then
+        /sbin/ip link set dev ${1} up  # Bring up interface
       fi
       if [ -x /etc/rc.d/rc.wireless ]; then
         . /etc/rc.d/rc.wireless ${1} start # Initialize any wireless parameters
@@ -177,6 +183,9 @@ if_up() {
           # Set up the network card:
           echo "/etc/rc.d/rc.inet1:  /sbin/ip address add ${IPADDR[$i]}/${NETMASK[$i]} dev ${1}" | $LOGGER
           /sbin/ip address add ${IPADDR[$i]}/${NETMASK[$i]} dev ${1}
+          if /sbin/ip link show dev ${1} | grep -wq "state DOWN" ; then
+            /sbin/ip link set dev ${1} up  # Bring up interface
+          fi
         else
           if [ "$DEBUG_ETH_UP" = "yes" ]; then
             echo "/etc/rc.d/rc.inet1:  ${1} interface is not configured in /etc/rc.d/rc.inet1.conf" | $LOGGER
