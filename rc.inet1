@@ -119,13 +119,13 @@ if_up() {
     fi
     return 0
   fi
-  if ! grep `echo ${1}: | cut -f 1 -d :`: /proc/net/dev 1> /dev/null ; then # no interface yet
+  if ! grep $(echo ${1}: | cut -f 1 -d :): /proc/net/dev 1> /dev/null ; then # no interface yet
     if /sbin/modprobe -c | grep -v "^#" | grep -w "alias ${1}" | grep -vw "alias ${1} off" > /dev/null ; then
       echo "/etc/rc.d/rc.inet1:  /sbin/modprobe ${1}" | $LOGGER
       /sbin/modprobe ${1}
     fi
   fi
-  if grep `echo ${1}: | cut -f 1 -d :`: /proc/net/dev 1> /dev/null ; then # interface exists
+  if grep $(echo ${1}: | cut -f 1 -d :): /proc/net/dev 1> /dev/null ; then # interface exists
     if ! /sbin/ip addr show ${1} 2>/dev/null | grep -wq inet || \
       ! /sbin/ip link show ${1} 2>/dev/null ; then # interface not up or not configured
       if [ ! "${HWADDR[$i]}" = "" ]; then # Set hardware address _before_ the interface goes up:
@@ -179,7 +179,7 @@ if_up() {
         if [ ! "${IPADDR[$i]}" = "" ]; then # skip unconfigured interfaces
           # Determine broadcast address from the IP address and netmask:
           # TODO: this seems unnecessary now... --rworkman
-          BROADCAST[$i]=`/bin/ipmask ${NETMASK[$i]} ${IPADDR[$i]}|cut -f1 -d' '`
+          BROADCAST[$i]=$(/bin/ipmask ${NETMASK[$i]} ${IPADDR[$i]}|cut -f1 -d' ')
           # Set up the network card:
           echo "/etc/rc.d/rc.inet1:  /sbin/ip address add ${IPADDR[$i]}/${NETMASK[$i]} dev ${1}" | $LOGGER
           /sbin/ip address add ${IPADDR[$i]}/${NETMASK[$i]} dev ${1}
@@ -212,7 +212,7 @@ if_down() {
     [ "${IFNAME[$i]}" = "${1}" ] && break
     i=$(($i+1))
   done
-  if grep `echo ${1}: | cut -f 1 -d :`: /proc/net/dev 1> /dev/null ; then
+  if grep $(echo ${1}: | cut -f 1 -d :): /proc/net/dev 1> /dev/null ; then
     if [ "${USE_DHCP[$i]}" = "yes" ]; then
       echo "/etc/rc.d/rc.inet1:  /sbin/dhcpcd -k -d ${1}" | $LOGGER
       /sbin/dhcpcd -k -d ${1} 2> /dev/null || /sbin/ip link set dev ${1} down
@@ -291,7 +291,7 @@ case "$1" in
   lo_up
   ;;
 *_start) # Example: "eth1_start" will start the specified interface 'eth1'
-  INTERFACE=`echo $1 | /bin/cut -d '_' -f 1`
+  INTERFACE=$(echo $1 | /bin/cut -d '_' -f 1)
   if_up $INTERFACE
   gateway_up
   ;;
@@ -299,11 +299,11 @@ case "$1" in
   lo_down
   ;;
 *_stop) # Example: "eth0_stop" will stop the specified interface 'eth0'
-  INTERFACE=`echo $1 | /bin/cut -d '_' -f 1`
+  INTERFACE=$(echo $1 | /bin/cut -d '_' -f 1)
   if_down $INTERFACE
   ;;
 *_restart) # Example: "wlan0_restart" will take 'wlan0' down and up again
-  INTERFACE=`echo $1 | /bin/cut -d '_' -f 1`
+  INTERFACE=$(echo $1 | /bin/cut -d '_' -f 1)
   if_down $INTERFACE
   sleep 1
   if_up $INTERFACE
@@ -319,7 +319,7 @@ case "$1" in
   lo_up
   ;;
 *_up) # "*_up" does the same thing as "*_start"
-  INTERFACE=`echo $1 | /bin/cut -d '_' -f 1`
+  INTERFACE=$(echo $1 | /bin/cut -d '_' -f 1)
   if_up $INTERFACE
   gateway_up
   ;;
@@ -327,7 +327,7 @@ case "$1" in
   lo_down
   ;;
 *_down) # "*_down" does the same thing as "*_stop"
-  INTERFACE=`echo $1 | /bin/cut -d '_' -f 1`
+  INTERFACE=$(echo $1 | /bin/cut -d '_' -f 1)
   if_down $INTERFACE
   ;;
 *) # The default is to bring up all configured interfaces:
