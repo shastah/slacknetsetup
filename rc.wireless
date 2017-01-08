@@ -84,7 +84,7 @@ done
 IWCOMMAND="$IWPATH/iwconfig ${INTERFACE}"
 IWPRIVCMD="$IWPATH/iwpriv ${INTERFACE}"
 IWSPYCMD="$IWPATH/iwspy ${INTERFACE}"
-IFCOMMAND="/sbin/ifconfig ${INTERFACE}"
+IFCOMMAND="/sbin/ip link set dev ${INTERFACE}"
 
 is_wireless_device ()
 {
