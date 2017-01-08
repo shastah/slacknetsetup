@@ -124,7 +124,7 @@ $IFCOMMAND up
 sleep 3
 
 # Get the MAC address for the interface
-HWADDR=$(/sbin/ifconfig ${INTERFACE} | sed -ne 's/.*\(..:..:..:..:..:..\).*/\U\1/p')
+HWADDR=$(/sbin/ip link show dev ${INTERFACE} | sed -ne 's/.*link\/ether \(..:..:..:..:..:..\).*/\U\1/p') 
 
 # Empty all wireless parameters- some of them could still be set for a previous interface:
 # when rc.inet1 is sourced from rc.M all scripts are run in the same shell.
