@@ -6,32 +6,15 @@ This document is/will be useful:  http://baturin.org/docs/iproute2/
 
 To prevent multiple people trying to push changes to master branch,
 please make changes in a user branch, push them, and I'll merge,
-or make a diff and send it to me.
+or make a diff and send it to me. If you would like commit access
+to a user branch, send me a mail with an ssh pubkey attached.
 
-Before production use and/or heavy testing, grep through for any
-instances of "TODO" and fix them :-)
+This branch is feature-complete with respect to the stock networking
+scripts in Slackware -current, but it also (has|will hopefully have)
+other features listed below as TODO items.
 
 TODO:
-
-There's plenty of room for refactoring and even rewriting here, such
-as supporting addition of tun/tap devices for adding to bridges or
-using for VPNs, supporting IPv6, etcetera. However, primary focus thus
-far is to simply duplicate existing functionality and make sure it all
-works as expected. Once that's confirmed, we can reassess where to go
-from there.
-
-I've got one host here (no tests run on this host though) that shows
-the loopback interface in state UNKNOWN:
-  1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-No idea how common this is, but perhaps a slight change of the loopback
-checking logic is needed...
-
-Tested successfully so far:
-  * dhcp configuration of one interface
-  * static configuration of one interface
-  * bridge with four interfaces (eth0, tap1, tap2, tap3) with static
-    IP address; I created the tap interfaces manually in rc.modules.local
-    since there's currently no support for creating them in the network
-    scripts
+  * create tun/tap interfaces			[done]
+  * additional IP addresses to interfaces
+  * IPv6 support
 
