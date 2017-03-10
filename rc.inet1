@@ -113,7 +113,7 @@ if_up() {
     if [ "$DEBUG_ETH_UP" = "yes" ]; then
       echo "/etc/rc.d/rc.inet1:  skipping ${1} early, interface is not configured in /etc/rc.d/rc.inet1.conf" | $LOGGER
     fi
-    continue
+    return 0
   fi
   if ! grep `echo ${1}: | cut -f 1 -d :`: /proc/net/dev 1> /dev/null ; then # no interface yet
     if /sbin/modprobe -c | grep -v "^#" | grep -w "alias ${1}" | grep -vw "alias ${1} off" > /dev/null ; then
