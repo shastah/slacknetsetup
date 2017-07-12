@@ -88,15 +88,15 @@ br_open() {
 
 # Function to disassemble a bridge interface.
 br_close() {
-  /sbin/ip link set ${IFNAME[$1]} down
+  /sbin/ip link set dev ${IFNAME[$1]} down
   # argument is 'i' - the position of this interface in the IFNAME array.
   #for BRIF in $(echo ${BRNICS[$1]}); do
   for BRIF in $(ls --indicator-style=none /sys/class/net/${IFNAME[$1]}/brif/)
   do
     /sbin/ip link set dev $BRIF nomaster
   done
-  /sbin/ip link set ${IFNAME[$1]} down
-  /sbin/ip link del name ${IFNAME[$1]} type bridge
+  /sbin/ip link set dev ${IFNAME[$1]} down
+  /sbin/ip link del ${IFNAME[$1]}
 }
 
 # Function to bring up a network interface.  If the interface is
