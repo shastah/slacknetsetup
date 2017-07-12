@@ -76,7 +76,7 @@ lo_down() {
 # Function to determine if virtual interfaces are defined
 virtif_determine() {
   if [ ! -z ${VIRTIFNAME} ]; then
-    virtifcount=$(echo ${VIRTIFNAME[@]} | wc -w)
+    virtifcount=$(expr $(echo ${VIRTIFNAME[@]} | wc -w) - 1)
   else
     return 1
   fi
