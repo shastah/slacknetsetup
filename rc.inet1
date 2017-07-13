@@ -200,6 +200,15 @@ if_up() {
         # 10 seconds should be a reasonable default DHCP timeout.  30 was too much.
         echo "/etc/rc.d/rc.inet1:  /sbin/dhcpcd -L -t ${DHCP_TIMEOUT[$i]:-10} ${DHCP_OPTIONS} ${1}" | $LOGGER
         /sbin/dhcpcd -L -t ${DHCP_TIMEOUT[$i]:-10} ${DHCP_OPTIONS} ${1}
+        # If the dhcpcd call succeeds, add extra IP addresses, if defined, to interface
+        if [ "$?" == "0" -a ! -z "${IPALIASES[$1]}" ]; then
+          num=0
+          for ipalias in $(echo ${IPALIASES[$i]}); do
+            /sbin/ip address add ${ipalias}/32 dev ${1} label ${1}:${num} ;
+            num=$(($num + 1))
+          done
+          unset num
+        fi
       else # bring up interface using a static IP address
         if [ ! "${IPADDR[$i]}" = "" ]; then # skip unconfigured interfaces
           # Determine broadcast address from the IP address and netmask:
@@ -210,6 +219,15 @@ if_up() {
           /sbin/ip address add ${IPADDR[$i]}/${NETMASK[$i]} dev ${1}
           if /sbin/ip link show dev ${1} | grep -wq "state DOWN" ; then
             /sbin/ip link set dev ${1} up  # Bring up interface
+          fi
+          # Add extra IP addresses, if defined, to interface
+          if [ ! -z "${IPALIASES[$i]}" ]; then
+            num=0
+            for ipalias in $(echo ${IPALIASES[$i]}); do
+              /sbin/ip address add ${ipalias}/32 dev ${1} label ${1}:${num} ;
+              num=$(($num + 1))
+            done
+            unset num
           fi
         else
           if [ "$DEBUG_ETH_UP" = "yes" ]; then
