@@ -15,6 +15,6 @@ other features listed below as TODO items.
 
 TODO:
   * create tun/tap interfaces			[done]
-  * additional IP addresses to interfaces
-  * IPv6 support
+  * additional IP addresses to interfaces	[done]
+  * IPv6 support				[yuck]
 
