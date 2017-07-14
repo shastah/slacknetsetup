@@ -9,13 +9,7 @@ please make changes in a user branch, push them, and I'll merge,
 or make a diff and send it to me. If you would like commit access
 to a user branch, send me a mail with an ssh pubkey attached.
 
-Before production use and/or heavy testing, grep through for any
-instances of "TODO" and fix them :-)
-
-At this point, I *think* this branch (master) has feature (and bug)
-parity with the stock networking scripts in Slackware -current.
-
-If you're interested in something more experimental (creation of
-virtual interfaces, along with ability to add them to a bridge),
-see the "virtual-ifs" branch instead.
+This branch is feature-complete with respect to the stock networking
+scripts in Slackware -current, but it also (has|will hopefully have)
+other features listed below as TODO items.
 

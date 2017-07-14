@@ -73,6 +73,31 @@ lo_down() {
 # INTERFACE FUNCTIONS #
 #######################
 
+# Function to determine if virtual interfaces are defined
+virtif_determine() {
+  if [ ! -z ${VIRTIFNAME} ]; then
+    virtifcount=$(($(echo ${VIRTIFNAME[@]} | wc -w) - 1))
+  else
+    return 1
+  fi
+}
+
+# Function to create virtual interfaces
+virtif_create() {
+  # argument is 'i' - the position of this interface in the IFNAME array.
+  for i in $(seq 0 ${virtifcount}); do
+    /sbin/ip tuntap add dev ${VIRTIFNAME[$i]} mode ${VIRTIFTYPE[$i]} user ${VIRTIFUSER[$i]} group ${VIRTIFGROUP[$i]}
+  done
+}
+
+# Function to destory virtual interfaces
+virtif_destroy() {
+  # argument is 'i' - the position of this interface in the IFNAME array.
+  for i in $(seq 0 ${virtifcount}); do
+    /sbin/ip tuntap del dev ${VIRTIFNAME[$i]} mode ${VIRTIFTYPE[$i]}
+  done
+}
+
 # Function to assemble a bridge interface.
 br_open() {
   # argument is 'i' - the position of this interface in the IFNAME array.
@@ -256,6 +281,7 @@ gateway_down() {
 # Function to start the network:
 start() {
   lo_up
+  virtif_determine && virtif_create
   for i in ${IFNAME[@]} ; do
     if_up $i
   done
@@ -268,6 +294,7 @@ stop() {
   for i in ${IFNAME[@]} ; do
     if_down $i
   done
+  virtif_determine && virtif_destroy
   lo_down
 }
 
