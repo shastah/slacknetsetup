@@ -12,6 +12,15 @@ to a user branch, send me a mail with an ssh pubkey attached.
 Current status of master branch:
 
 * Complete feature parity with stock networking scripts
+
 * Supports create/destroy of virtual tun/tap interfaces
   and adding them to bridges
+
+* Supports additional IP addresses added to interfaces
+  in a way that's compatible with net-tools
+
+* TODO: IPv6 support ; suggestions welcome, as I really don't know
+        how I want to proceed with that. For home, I basically 
+        rewrote (a very simple version of) the network scripts,
+        but that obviously doesn't scale :/
 
