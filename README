@@ -9,7 +9,9 @@ please make changes in a user branch, push them, and I'll merge,
 or make a diff and send it to me. If you would like commit access
 to a user branch, send me a mail with an ssh pubkey attached.
 
-This branch is feature-complete with respect to the stock networking
-scripts in Slackware -current, but it also (has|will hopefully have)
-other features listed below as TODO items.
+Current status of master branch:
+
+* Complete feature parity with stock networking scripts
+* Supports create/destroy of virtual tun/tap interfaces
+  and adding them to bridges
 
