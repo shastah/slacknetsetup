@@ -211,9 +211,6 @@ if_up() {
         fi
       else # bring up interface using a static IP address
         if [ ! "${IPADDR[$i]}" = "" ]; then # skip unconfigured interfaces
-          # Determine broadcast address from the IP address and netmask:
-          # TODO: this seems unnecessary now... --rworkman
-          BROADCAST[$i]=$(/bin/ipmask ${NETMASK[$i]} ${IPADDR[$i]}|cut -f1 -d' ')
           # Set up the network card:
           echo "/etc/rc.d/rc.inet1:  /sbin/ip address add ${IPADDR[$i]}/${NETMASK[$i]} dev ${1}" | $LOGGER
           /sbin/ip address add ${IPADDR[$i]}/${NETMASK[$i]} dev ${1}
