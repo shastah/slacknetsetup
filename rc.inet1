@@ -51,7 +51,7 @@ fi
 # already up, do nothing.
 lo_up() {
   if grep lo: /proc/net/dev 1> /dev/null ; then
-    if ! /sbin/ip link show dev lo | grep -wq "state UP" ; then
+    if ! /sbin/ip link show dev lo | grep -wq -e "state UP" -e "state UNKNOWN" ; then
       echo "/etc/rc.d/rc.inet1:  /sbin/ip address add 127.0.0.1/8 dev lo" | $LOGGER
       /sbin/ip address add 127.0.0.1/8 dev lo
       /sbin/ip link set dev lo up
