@@ -22,6 +22,13 @@ else # output to stdout/stderr:
   LOGGER=/bin/cat
 fi
 
+# Handy wrapper for verbose logging
+debug_log() {
+  if [ "$DEBUG_ETH_UP" = "yes" ]; then
+    echo "/etc/rc.d/rc.inet1:  $*" | $LOGGER
+  fi
+}
+
 ############################
 # DETERMINE INTERFACE LIST #
 ############################
@@ -39,9 +46,7 @@ do
   IFNAME[$i]=${IFNAME[$i]:=eth${i}}
   i=$(($i+1))
 done
-if [ "$DEBUG_ETH_UP" = "yes" ]; then
-  echo "/etc/rc.d/rc.inet1:  List of interfaces: '${IFNAME[*]}'" | $LOGGER
-fi
+debug_log "List of interfaces: '${IFNAME[*]}'"
 
 ######################
 # LOOPBACK FUNCTIONS #
@@ -140,9 +145,7 @@ if_up() {
   # If the interface isn't in the kernel yet (but there's an alias for it in
   # modules.conf), then it should be loaded first:
   if [ -z "${IPADDR[$i]}" ] && [ "${USE_DHCP[$i]}" != "yes" ]; then # skip unconfigured interfaces
-    if [ "$DEBUG_ETH_UP" = "yes" ]; then
-      echo "/etc/rc.d/rc.inet1:  skipping ${1} early, interface is not configured in /etc/rc.d/rc.inet1.conf" | $LOGGER
-    fi
+    debug_log "skipping ${1} early, interface is not configured in /etc/rc.d/rc.inet1.conf"
     return 0
   fi
   if ! grep $(echo ${1}: | cut -f 1 -d :): /proc/net/dev 1> /dev/null ; then # no interface yet
@@ -226,20 +229,14 @@ if_up() {
             done
           fi
         else
-          if [ "$DEBUG_ETH_UP" = "yes" ]; then
-            echo "/etc/rc.d/rc.inet1:  ${1} interface is not configured in /etc/rc.d/rc.inet1.conf" | $LOGGER
-          fi
+          debug_log "${1} interface is not configured in /etc/rc.d/rc.inet1.conf"
         fi
       fi
     else
-      if [ "$DEBUG_ETH_UP" = "yes" ]; then
-        echo "/etc/rc.d/rc.inet1:  ${1} is already up, skipping" | $LOGGER
-      fi
+      debug_log "${1} is already up, skipping"
     fi 
   else
-    if [ "$DEBUG_ETH_UP" = "yes" ]; then
-      echo "/etc/rc.d/rc.inet1:  ${1} interface does not exist (yet)" | $LOGGER
-    fi
+    debug_log "${1} interface does not exist (yet)"
   fi
 }
 
