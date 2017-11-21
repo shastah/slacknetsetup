@@ -95,7 +95,7 @@ virtif_destroy() {
 br_open() {
   # argument is 'i' - the position of this interface in the IFNAME array.
   /sbin/ip link add name ${IFNAME[$1]} type bridge
-  for BRIF in $(echo ${BRNICS[$1]}); do
+  for BRIF in ${BRNICS[$1]}; do
     /sbin/ip link set $BRIF down
     /sbin/ip address add 0.0.0.0 dev $BRIF
     /sbin/ip link set dev $BRIF master ${IFNAME[$1]}
@@ -108,7 +108,7 @@ br_open() {
 br_close() {
   /sbin/ip link set dev ${IFNAME[$1]} down
   # argument is 'i' - the position of this interface in the IFNAME array.
-  #for BRIF in $(echo ${BRNICS[$1]}); do
+  #for BRIF in ${BRNICS[$1]}; do
   for BRIF in $(ls --indicator-style=none /sys/class/net/${IFNAME[$1]}/brif/)
   do
     /sbin/ip link set dev $BRIF nomaster
@@ -196,7 +196,7 @@ if_up() {
         # If the dhcpcd call succeeds, add extra IP addresses, if defined, to interface
         if [ "$?" == "0" ] && [ -n "${IPALIASES[$1]}" ]; then
           num=0
-          for ipalias in $(echo ${IPALIASES[$i]}); do
+          for ipalias in ${IPALIASES[$i]}; do
             /sbin/ip address add ${ipalias}/32 dev ${1} label ${1}:${num} ;
             num=$(($num + 1))
           done
@@ -213,7 +213,7 @@ if_up() {
           # Add extra IP addresses, if defined, to interface
           if [ -n "${IPALIASES[$i]}" ]; then
             num=0
-            for ipalias in $(echo ${IPALIASES[$i]}); do
+            for ipalias in ${IPALIASES[$i]}; do
               /sbin/ip address add ${ipalias}/32 dev ${1} label ${1}:${num} ;
               num=$(($num + 1))
             done
