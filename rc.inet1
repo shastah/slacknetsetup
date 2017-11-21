@@ -40,7 +40,7 @@ do
   i=$(($i+1))
 done
 if [ "$DEBUG_ETH_UP" = "yes" ]; then
-  echo "/etc/rc.d/rc.inet1:  List of interfaces: '${IFNAME[@]}'" | $LOGGER
+  echo "/etc/rc.d/rc.inet1:  List of interfaces: '${IFNAME[*]}'" | $LOGGER
 fi
 
 ######################
