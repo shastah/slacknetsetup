@@ -200,7 +200,6 @@ if_up() {
             /sbin/ip address add ${ipalias}/32 dev ${1} label ${1}:${num} ;
             num=$(($num + 1))
           done
-          unset num
         fi
       else # bring up interface using a static IP address
         if [ -n "${IPADDR[$i]}" ]; then # skip unconfigured interfaces
@@ -217,7 +216,6 @@ if_up() {
               /sbin/ip address add ${ipalias}/32 dev ${1} label ${1}:${num} ;
               num=$(($num + 1))
             done
-            unset num
           fi
         else
           if [ "$DEBUG_ETH_UP" = "yes" ]; then
