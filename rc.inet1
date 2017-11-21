@@ -96,12 +96,12 @@ br_open() {
   # argument is 'i' - the position of this interface in the IFNAME array.
   /sbin/ip link add name ${IFNAME[$1]} type bridge
   for BRIF in ${BRNICS[$1]}; do
-    /sbin/ip link set $BRIF down
+    /sbin/ip link set dev $BRIF down
     /sbin/ip address add 0.0.0.0 dev $BRIF
     /sbin/ip link set dev $BRIF master ${IFNAME[$1]}
-    /sbin/ip link set $BRIF up 
+    /sbin/ip link set dev $BRIF up
   done
-  /sbin/ip link set ${IFNAME[$1]} up
+  /sbin/ip link set dev ${IFNAME[$1]} up
 }
 
 # Function to disassemble a bridge interface.
@@ -144,7 +144,7 @@ if_up() {
     fi
   fi
   if grep $(echo ${1}: | cut -f 1 -d :): /proc/net/dev 1> /dev/null ; then # interface exists
-    if ! /sbin/ip addr show ${1} 2>/dev/null | grep -wq inet || \
+    if ! /sbin/ip address show dev ${1} 2>/dev/null | grep -wq inet || \
       ! /sbin/ip link show dev ${1} | grep -wq "state UP" ; then # interface not up or not configured
       if [ -n "${HWADDR[$i]}" ]; then # Set hardware address _before_ the interface goes up:
         echo "/etc/rc.d/rc.inet1:  /sbin/ip link set dev ${1} address ${HWADDR[$i]}" | $LOGGER
