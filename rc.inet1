@@ -127,6 +127,14 @@ if_up() {
     [ "${IFNAME[$i]}" = "${1}" ] && break
     i=$(($i+1))
   done
+  # If "i" is greater or equal to "MAXNICS" at this point, it means we didn't
+  # find an entry in IFNAME array corresponding to "$1", which likely means
+  # there are more interfaces configured than MAXNICS. Let's err on the
+  # side of caution and do nothing instead of possibly doing the wrong thing.
+  if [ $i -ge $MAXNICS ]; then
+    echo "/etc/rc.d/rc.inet1:  skipping ${1}, you might need to increase MAXNICS" | $LOGGER
+    return
+  fi
   # If the interface is a bridge, then create it first:
   [ -n "${BRNICS[$i]}" ] && br_open $i
   # If the interface isn't in the kernel yet (but there's an alias for it in
@@ -243,6 +251,10 @@ if_down() {
     [ "${IFNAME[$i]}" = "${1}" ] && break
     i=$(($i+1))
   done
+  if [ $i -ge $MAXNICS ]; then
+    echo "/etc/rc.d/rc.inet1:  skipping ${1}, you might need to increase MAXNICS" | $LOGGER
+    return
+  fi
   if grep $(echo ${1}: | cut -f 1 -d :): /proc/net/dev 1> /dev/null ; then
     if [ "${USE_DHCP[$i]}" = "yes" ]; then
       echo "/etc/rc.d/rc.inet1:  /sbin/dhcpcd -k -d ${1}" | $LOGGER
