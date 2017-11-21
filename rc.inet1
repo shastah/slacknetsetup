@@ -55,7 +55,7 @@ debug_log "List of interfaces: '${IFNAME[*]}'"
 # Function to bring up the loopback interface.  If loopback is
 # already up, do nothing.
 lo_up() {
-  if grep lo: /proc/net/dev 1> /dev/null ; then
+  if [ -e /sys/class/net/lo ]; then
     if ! /sbin/ip link show dev lo | grep -wq -e "state UP" -e "state UNKNOWN" ; then
       echo "/etc/rc.d/rc.inet1:  /sbin/ip address add 127.0.0.1/8 dev lo" | $LOGGER
       /sbin/ip address add 127.0.0.1/8 dev lo
@@ -68,7 +68,7 @@ lo_up() {
 
 # Function to take down the loopback interface:
 lo_down() {
-  if grep lo: /proc/net/dev 1> /dev/null ; then
+  if [ -e /sys/class/net/lo ]; then
     echo "/etc/rc.d/rc.inet1:  /sbin/ip link set dev lo down" | $LOGGER
     /sbin/ip link set dev lo down
   fi
@@ -148,13 +148,13 @@ if_up() {
     debug_log "skipping ${1} early, interface is not configured in /etc/rc.d/rc.inet1.conf"
     return 0
   fi
-  if ! grep $(echo ${1}: | cut -f 1 -d :): /proc/net/dev 1> /dev/null ; then # no interface yet
+  if [ ! -e /sys/class/net/${1%%:*} ]; then # no interface yet
     if /sbin/modprobe -c | grep -v "^#" | grep -w "alias ${1}" | grep -vw "alias ${1} off" > /dev/null ; then
       echo "/etc/rc.d/rc.inet1:  /sbin/modprobe ${1}" | $LOGGER
       /sbin/modprobe ${1}
     fi
   fi
-  if grep $(echo ${1}: | cut -f 1 -d :): /proc/net/dev 1> /dev/null ; then # interface exists
+  if [ -e /sys/class/net/${1%%:*} ]; then # interface exists
     if ! /sbin/ip address show dev ${1} 2>/dev/null | grep -wq inet || \
       ! /sbin/ip link show dev ${1} | grep -wq "state UP" ; then # interface not up or not configured
       if [ -n "${HWADDR[$i]}" ]; then # Set hardware address _before_ the interface goes up:
@@ -252,7 +252,7 @@ if_down() {
     echo "/etc/rc.d/rc.inet1:  skipping ${1}, you might need to increase MAXNICS" | $LOGGER
     return
   fi
-  if grep $(echo ${1}: | cut -f 1 -d :): /proc/net/dev 1> /dev/null ; then
+  if [ -e /sys/class/net/${1%%:*} ]; then
     if [ "${USE_DHCP[$i]}" = "yes" ]; then
       echo "/etc/rc.d/rc.inet1:  /sbin/dhcpcd -k -d ${1}" | $LOGGER
       /sbin/dhcpcd -k -d ${1} 2> /dev/null || /sbin/ip link set dev ${1} down
