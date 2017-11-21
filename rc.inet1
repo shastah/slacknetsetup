@@ -310,28 +310,28 @@ stop() {
 ############
 
 case "$1" in
-'start') # "start" brings up all configured interfaces:
+start|up) # "start" (or "up") brings up all configured interfaces:
   start
   ;;
-'stop') # "stop" takes down all configured interfaces:
+stop|down) # "stop" (or "down") takes down all configured interfaces:
   stop
   ;;
-'restart') # "restart" restarts the network:
+restart) # "restart" restarts the network:
   stop
   start
   ;;
-'lo_start') # Start the loopback interface:
+lo_start|lo_up) # Start the loopback interface:
   lo_up
   ;;
-*_start) # Example: "eth1_start" will start the specified interface 'eth1'
+lo_stop|lo_down) # Stop the loopback interface:
+  lo_down
+  ;;
+*_start|*_up) # Example: "eth1_start" (or "eth1_up") will start the specified interface 'eth1'
   INTERFACE=$(echo $1 | /bin/cut -d '_' -f 1)
   if_up $INTERFACE
   gateway_up
   ;;
-'lo_stop') # Stop the loopback interface:
-  lo_down
-  ;;
-*_stop) # Example: "eth0_stop" will stop the specified interface 'eth0'
+*_stop|*_down) # Example: "eth0_stop" (or "eth0_down") will stop the specified interface 'eth0'
   INTERFACE=$(echo $1 | /bin/cut -d '_' -f 1)
   if_down $INTERFACE
   ;;
@@ -341,27 +341,6 @@ case "$1" in
   sleep 1
   if_up $INTERFACE
   gateway_up
-  ;;
-'up') # "up" does the same thing as "start"
-  start
-  ;;
-'down') # "down" does the same thing as "stop"
-  stop
-  ;;
-'lo_up') # Start the loopback interface:
-  lo_up
-  ;;
-*_up) # "*_up" does the same thing as "*_start"
-  INTERFACE=$(echo $1 | /bin/cut -d '_' -f 1)
-  if_up $INTERFACE
-  gateway_up
-  ;;
-'lo_down') # Stop the loopback interface:
-  lo_down
-  ;;
-*_down) # "*_down" does the same thing as "*_stop"
-  INTERFACE=$(echo $1 | /bin/cut -d '_' -f 1)
-  if_down $INTERFACE
   ;;
 *) # The default is to bring up all configured interfaces:
   start
